@@ -1,11 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import LottieView from "lottie-react-native";
 import Map from "./src/components/Map";
+import * as Location from "expo-location";
 
 export default function App() {
   const [loaded, setLoaded] = useState(false);
-  console.log(loaded);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [initialRegion, setInitialRegion] = useState(null);
+
+  useEffect(() => {
+    const getLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setCurrentLocation(location.coords);
+
+      setInitialRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+    };
+
+    getLocation();
+  }, []);
+
   if (loaded === false) {
     return (
       <View style={styles.splash}>
@@ -24,8 +49,13 @@ export default function App() {
         />
       </View>
     );
-  } else {
-    return <Map />;
+  } else if (currentLocation && initialRegion) {
+    return (
+      <Map
+        currentLocation={currentLocation}
+        initialRegion={initialRegion}
+      ></Map>
+    );
   }
 }
 

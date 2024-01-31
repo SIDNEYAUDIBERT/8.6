@@ -8,38 +8,12 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
+// const windowWidth = Dimensions.get("window").width;
+// const windowHeight = Dimensions.get("window").height;
 
-export default function Map() {
-  const [currentLocation, setCurrentLocation] = useState(null);
-  const [initialRegion, setInitialRegion] = useState(null);
-
-  useEffect(() => {
-    const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.log("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation(location.coords);
-
-      setInitialRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      });
-    };
-
-    getLocation();
-  }, []);
-
+export default function Map({ currentLocation, initialRegion }) {
   return (
     <View style={styles.container}>
       {initialRegion && (
